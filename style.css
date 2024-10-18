@@ -1,0 +1,65 @@
+@font-face {
+    font-family: 'Retro';
+    src: url('assets/fonts/PressStart2P-vaV7.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+#section {
+    background-color: #000;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    position: absolute;
+}
+
+#centerContent {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    z-index: 100;
+}
+
+.leftContent {
+   
+    
+    z-index: 100;
+    text-align: left;
+}
+
+.rightContent {
+    position: absolute;
+    top: 15%;
+    right: 10%;
+    width: 33%;
+    height: 70%;
+    color: #fff;
+}
+
+
+button {
+    background-color: #000;
+    font-family: 'Retro';
+    color: #fff;
+    padding: 10px 20px;
+    margin: 10px;
+    cursor: pointer;
+
+}
+p {
+    font-size: 1em;
+    color: #fff;
+    font-family: 'Retro';
+}
