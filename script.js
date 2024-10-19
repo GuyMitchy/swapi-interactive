@@ -1,11 +1,10 @@
+/* jshint esversion: 6 */
 
 // TEACHING MYSELF API CALLING BY BUILDING THIS INTERACTIVE STAR WARS DATABASE USING LIVE DATA FROM SWAPI - I WILL BE USING THIS CODE AS A TEMPLATE FOR OTHER APIS - HENCE THE COMMENTS
 // AI ASSISTED BUT NO CODE WRITTEN BY AI, JUST USED AS A GUIDE TO HELP ME UNDERSTAND THE API CALLING PROCESS.
 
 
-
-
-const starWarsData = { };  //only getting 10 results from each category, need to fix - due to pagination
+let starWarsData = {};  //only getting 10 results from each category, need to fix - due to pagination - Want to figure out how to store this not in global scope
 
 
 
@@ -19,31 +18,58 @@ function fetchData() {
     const baseUrl = 'https://swapi.dev/api/'; //base url of api
     let promises = [];
 
-    
+
     console.log('Starting to fetch data...');
 
+       // Check if we have cached data
+       const cachedData = localStorage.getItem('starWarsData');
+       if (cachedData) {
+           console.log('Using cached data');
+           starWarsData = JSON.parse(cachedData);
+           return Promise.resolve();
+       }
+   
 
-    for (let category of categories) { //for each category in the categories array
-            let promise = fetch(`${baseUrl}${category}/`) // store the promise so that we can add it to an array, and return the complete promise array once all promises are fulfilled
-            .then(response => response.json()) //convert the response to json
-            .then(data => {
-                starWarsData[category] = data.results; //store the data in the starWarsData object
-                console.log(starWarsData[category]); //log the data to the console
-            })
+       // Recursively fetches all pages of a given category - Was confused about the basecase here cause
+       // in all the examples i'd done in tutorails it was the first statment in the function, but here 
+       // its the else sttatement within the promise chain.
+       // we hit it when we get a response with no next page data, and store the data we have then reccurse back up the call stack.
+
+
+       function fetchAllPages(url, category, results = []) {   
+           return fetch(url)
+               .then(response => response.json())
+               .then(data => {
+                   results = results.concat(data.results);
+                   if (data.next) {
+                       return fetchAllPages(data.next, category, results);
+                   } else {
+                       starWarsData[category] = results;
+                       return results;
+                   }
+               });
+       }
+
+
+       for (let category of categories) {
+        let promise = fetchAllPages(`${baseUrl}${category}/`, category)
             .catch((e) => {
-                console.error(`Error: ${e}`); //log the error to the console
-            })
-            promises.push(promise); //push the promise to the promises array
+                console.error(`Error fetching ${category}: ${e}`);
+            });
+        promises.push(promise);
     }
-    return Promise.all(promises).then(() => { // Wait for all promises to resolve then return all the data
-    console.log('All fetch operations completed.'); //log message when all promises are resolved
-    console.log('Final starWarsData:', JSON.stringify(starWarsData, null, 2)); //log the starWarsData object to the console
+    return Promise.all(promises).then(() => { 
+        console.log('All fetch operations completed.');
+        // Cache the data in localStorage
+        localStorage.setItem('starWarsData', JSON.stringify(starWarsData));
+        console.log('Data cached in localStorage');
+        console.log('Final starWarsData:', JSON.stringify(starWarsData, null, 2));
+    });
 }
-)}
 
 
 /**
- * 
+ * creates category buttons for each category in the starWarsData object
  * 
  */
 function createCategoryButtons(data) {
@@ -51,54 +77,72 @@ function createCategoryButtons(data) {
     centerContent.innerHTML = '';
 
     for (let category in data) {
-        const button = document.createElement('button'); 
-        button.textContent = category; 
+        const button = document.createElement('button');
+        button.textContent = category;
         button.addEventListener('click', () => clickCategoryButtons(category));
         centerContent.appendChild(button);
     }
-    
+
 }
 function clickCategoryButtons(category) {
-    const categoryData = starWarsData[category];
-    switch(category) {
-            case 'people':
-                displayNameList(categoryData);
-                break;
-            case 'planets':
-                displayPlanetsData(categoryData);
-                break;
-            case 'films':
-                displayFilmsData(categoryData);
-                break;
-            case 'species':
-                displaySpeciesData(categoryData);
-                break;
-            case 'vehicles':
-                displayVehiclesData(categoryData);
-                break;
-            case 'starships':
-                displayStarshipsData(categoryData);
-                break;
-            default:
-                console.error('Invalid category: ', category);
-        }
+    displayCategoryData(category);
+}
 
-    }
-
-
-
-function displayNameList(data) {
+function displayCategoryData(category) {
     const centerContent = document.getElementById('centerContent');
     centerContent.innerHTML = '';
     const leftContent = document.getElementById('leftContent');
     leftContent.innerHTML = '';
-    for (let person of data) {
-        leftContent.innerHTML += `<p>${person.name}</p>`;
+
+    for (let item of starWarsData[category]) {
+        const element = document.createElement('p');
+        element.classList.add('crosshair');
+        element.textContent = item.name || item.title; // Use title for films, name for others
+        leftContent.appendChild(element);
+
+        element.addEventListener('click', () => displayItemDetails(item, category));
     }
 }
 
+function displayItemDetails(item, category) {
+    const rightContent = document.getElementById('rightContent');
+    rightContent.innerHTML = '';
 
+    
+    const allKeys = ['name', 'title', 'model', 'manufacturer', 'cost_in_credits', 'length', 'crew', 'passengers', 'cargo_capacity', 'consumables', 'vehicle_class', 'starship_class', 'classification', 'designation', 'average_height', 'average_lifespan', 'eye_colors', 'hair_colors', 'skin_colors', 'language', 'climate', 'terrain', 'surface_water', 'population', 'rotation_period', 'orbital_period', 'diameter', 'gravity'];
 
+    rightContent.innerHTML += `<h1 class="nameTitle">${item.name || item.title}</h1>`;
+
+    for (let key of allKeys) {
+        if (item[key]) {
+            rightContent.innerHTML += `<p>${key.replace('_', ' ').capitalize()}: ${item[key]}</p>`;
+        }
+    }
+
+    // Handle related data (films, people, etc.)
+    const relatedCategories = ['films', 'people', 'species', 'starships', 'vehicles', 'planets'];
+
+    for (let relatedCategory of relatedCategories) {
+        if (item[relatedCategory] && item[relatedCategory].length > 0) {
+            const relatedItems = item[relatedCategory].map(url => {
+                const id = getIdFromUrl(url);
+                const relatedData = starWarsData[relatedCategory][id - 1];
+                return relatedData ? (relatedData.name || relatedData.title) : 'Unknown';
+            }).join(', ');
+            rightContent.innerHTML += `<p>${relatedCategory.capitalize()}: ${relatedItems}</p>`;
+        }
+    }
+}
+
+// Helper functions
+function getIdFromUrl(url) {
+    const parts = url.split('/');
+    return parts[parts.length - 2];
+}
+
+String.prototype.capitalize = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+};
 
 // Page functions.
 
@@ -140,9 +184,6 @@ function init() {
     loadingPage();
     fetchData().then(() => {
         mainPage();
-
-        
-        
     }).catch(error => {
         console.error("Error fetching data:", error);
     });
@@ -152,4 +193,89 @@ document.addEventListener('DOMContentLoaded', init); //add an event listener to 
 
 
 
+// This is how i disaplyed the people nam elist and data orignally. ive now changed to a more 
+// refinede approach by using this as a template to make agenreal funtion to display all data types.
 
+
+// function displayNameList(data) {
+//     const centerContent = document.getElementById('centerContent');
+//     centerContent.innerHTML = '';
+//     const leftContent = document.getElementById('leftContent');
+//     leftContent.innerHTML = '';
+//     for (let person of data) {
+//         const name = document.createElement('p');
+//         name.classList.add('crosshair');
+//         name.textContent = person.name;
+//         leftContent.appendChild(name);
+
+//         name.addEventListener('click', () => displayPersonData(person));
+//     }
+// }
+
+// function displayPersonData(person) {
+//     const centerContent = document.getElementById('centerContent');
+//     const rightContent = document.getElementById('rightContent');
+//     rightContent.innerHTML = '';
+//     rightContent.innerHTML += `<h1 class="nameTitle">${person.name}</h1>`;
+//     rightContent.innerHTML += `<p>Height: ${person.height}</p>`;
+//     rightContent.innerHTML += `<p>Mass: ${person.mass}</p>`;
+//     rightContent.innerHTML += `<p>Hair Color: ${person.hair_color}</p>`;
+//     rightContent.innerHTML += `<p>Skin Color: ${person.skin_color}</p>`;
+//     rightContent.innerHTML += `<p>Eye Color: ${person.eye_color}</p>`;
+//     rightContent.innerHTML += `<p>Birth Year: ${person.birth_year}</p>`;
+//     rightContent.innerHTML += `<p>Gender: ${person.gender}</p>`;
+
+//     function getIndexFromUrl(url) {
+        
+//         const parts = url.split('/');
+//         console.log(`Index: ${Number(parts[parts.length - 2])}`);
+//         return Number(parts[parts.length - 2]);
+//     }
+
+
+//     rightContent.innerHTML += `<p>Homeworld: ${starWarsData.planets[person.homeworld.slice(-2, -1)].name}</p>`; // Use the number on the end of the endpoint url to index the star wars data to get the name of the homeworld!!
+//     // Handle films
+//     const filmUrls = person.films;
+//     filmUrls.forEach(filmUrl => {
+//         let i = getIndexFromUrl(filmUrl);
+//         let film = starWarsData.films[i - 1].title;
+
+//         rightContent.innerHTML += `<p>Film: ${film}</p>`;
+//     });
+
+//     // Handle species
+//     const speciesUrls = person.species;
+//     console.log(speciesUrls);
+//     speciesUrls.forEach(speciesUrl => {
+//         let i = getIndexFromUrl(speciesUrl);
+//         const species = starWarsData.species[i - 1].name;
+//         console.log(species);
+//         rightContent.innerHTML += `<p>Species: ${species}</p>`;
+//     });
+
+//     // Logic should be sound for these two functions but were getting errors when the index is over 10 because of pagination.
+
+//     // Handle vehicles
+//     const vehiclesUrls = person.vehicles;
+//     console.log(vehiclesUrls);
+//     vehiclesUrls.forEach(vehiclesUrl => {
+//         let i = getIndexFromUrl(vehiclesUrl);
+//         const vehicles = starWarsData.vehicles[i - 1].name;
+//         console.log(vehicles);
+//         rightContent.innerHTML += `<p>Vehicles: ${vehicles}</p>`;
+//     });
+
+//     // Handle starships
+//     const starshipsUrls = person.starships;
+//     console.log(starshipsUrls);
+//     starshipsUrls.forEach(starshipsUrl => {
+//         let i = getIndexFromUrl(starshipsUrl);
+//         const starships = starWarsData.starships[i - 1].name;
+//         console.log(starships);
+//         rightContent.innerHTML += `<p>Starships: ${starships}</p>`;
+//     });
+
+
+
+
+// }

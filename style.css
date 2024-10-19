@@ -5,6 +5,30 @@
     font-style: normal;
 }
 
+button {
+    background-color: #000;
+    font-family: 'Retro';
+    color: #fff;
+    padding: 10px 20px;
+    margin: 10px;
+    cursor: pointer;
+
+}
+p {
+    font-size: 1em;
+    color: #fff;
+    font-family: 'Retro';
+    line-height: 1.5;
+}
+.nameTitle {
+    font-size: 2em;
+    color: #fff;
+    font-family: 'Retro';
+}
+
+.crosshair {
+    cursor: crosshair;
+}
 
 
 body, html {
@@ -23,6 +47,11 @@ body, html {
     position: absolute;
 }
 
+.center-content-container {
+    padding-left: 40px;
+    padding-top: 20px;
+}
+
 #centerContent {
     position: absolute;
     top: 50%;
@@ -30,36 +59,72 @@ body, html {
     transform: translate(-50%, -50%);
     color: #fff;
     z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.left-content-container {
+    padding-left: 40px;
+    padding-top: 20px;
+    margin-right: 40px;
+    width: 80%;
+    height: 90vh; /* Set a fixed height */
+  overflow-y: scroll; /* Enable vertical scrolling */
+  padding-right: 17px; /* Prevent content shift */
+   /* Hide scrollbar for Chrome, Safari, and Opera */
+
+   &::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Hide scrollbar for IE, Edge, and Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .leftContent {
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: center;
+   z-index: 100;
+   text-align: left;
    
-    
-    z-index: 100;
-    text-align: left;
+   
+   
+  
+ 
 }
+
+
+.right-content-container {
+    padding-left: 40px;
+    padding-top: 20px;
+    width: 80%;
+    height: 90vh; /* Set a fixed height */
+  overflow-y: scroll; /* Enable vertical scrolling */
+  padding-right: 17px; /* Prevent content shift */
+   /* Hide scrollbar for Chrome, Safari, and Opera */
+
+   &::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Hide scrollbar for IE, Edge, and Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 
 .rightContent {
-    position: absolute;
-    top: 15%;
-    right: 10%;
-    width: 33%;
-    height: 70%;
-    color: #fff;
+   
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 
-button {
-    background-color: #000;
-    font-family: 'Retro';
-    color: #fff;
-    padding: 10px 20px;
-    margin: 10px;
-    cursor: pointer;
 
-}
-p {
-    font-size: 1em;
-    color: #fff;
-    font-family: 'Retro';
-}
