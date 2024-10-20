@@ -82,40 +82,40 @@ function createCategoryButtons(data) {
     for (let category in data) {
         const button = document.createElement('button');
         button.textContent = category.capitalize();
-        button.addEventListener('click', () => clickCategoryButtons(category));
+        button.addEventListener('click', () => displayCategoryData(category));
         centerContent.appendChild(button);
     }
 
 }
-function clickCategoryButtons(category) {
-    displayCategoryData(category);
-}
+
 
 function displayCategoryData(category) {
     const centerContent = document.getElementById('centerContent');
-    centerContent.innerHTML = '';
     const leftContent = document.getElementById('leftContent');
-    leftContent.innerHTML = '';
     const bg = document.getElementById('section');
+    const backButton = document.createElement('button');
+    centerContent.innerHTML = '';
+    leftContent.innerHTML = '';
     bg.classList.remove('bg-logo');
     bg.classList.add('bg-no-logo');
-    const backButton = document.createElement('button');
+    
     backButton.textContent = 'Back';
     backButton.addEventListener('click', () => backButtonClick());
     backButtonContainer.appendChild(backButton);
 
     for (let item of Object.values(starWarsData[category])) {
         const element = document.createElement('p');
-        element.classList.add('crosshair');
+        element.classList.add('crosshair', 'gold');
+        
         element.textContent = item.name || item.title; // Use title for films, name for others
         leftContent.appendChild(element);
 
-        element.addEventListener('click', () => displayItemDetails(item, category));
+        element.addEventListener('click', () => displayItemDetails(item));
         
     }
 }
 
-function displayItemDetails(item, category) {
+function displayItemDetails(item) {
     const rightContent = document.getElementById('rightContent');
     rightContent.innerHTML = '';
 
@@ -166,10 +166,6 @@ function displayItemDetails(item, category) {
             rightContent.innerHTML += `<p>${displayCategory}: ${relatedItems}</p>`;
         }
     }
-
-    
-
-    
 }
 
 // Helper functions
@@ -192,6 +188,35 @@ String.prototype.capitalize = function() {
     return this.charAt(0).toUpperCase() + this.slice(1);
 };
 
+
+// INFO MODAL
+
+// Get the modal
+var modal = document.getElementById("infoModal");
+
+// Get the button that opens the modal
+var btn = document.getElementById("infoButton");
+
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
+
+// When the user clicks on the button, open the modal
+btn.onclick = function() {
+  modal.style.display = "block";
+}
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+  modal.style.display = "none";
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
+}
+
 // Page functions.
 
 function loadingPage() {
@@ -201,11 +226,6 @@ function loadingPage() {
 function mainPage() {
     createCategoryButtons(starWarsData);
 }
-
-
-
-
-
 
 /**
  * Initializes the application by fetching the data and displaying it on the webpage

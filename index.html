@@ -6,11 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Swapi Interactive Database</title>
     <link rel="icon" type="image/x-icon" href="./assets/favicon_io/favicon.ico">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="./assets/css/style.css">
 </head>
 
 <body>
     <section id="section" class="bg-logo">
+        <button id="infoButton"><i class="fa fa-info-circle"></i></button>
         
        
         
@@ -28,6 +30,25 @@
     <div id="backButtonContainer"></div>
     
     </section>
+
+
+    <!-- INFO MODAL -->
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>About This Project</h2>
+            <p>This interactive Star Wars database was created as an educational project to learn about API integration and data manipulation in JavaScript. It uses data from the Star Wars API (SWAPI).</p>
+            <p>Copyright Notice: This project is not affiliated with or endorsed by Lucasfilm Ltd. or Disney. The Star Wars logo and trademark are used for educational purposes only. This project is non-commercial and generates no revenue.</p>
+            <p>Copyright Compliance: While this project is intended for educational purposes and falls under fair use, I respect intellectual property rights. If you are a copyright holder and believe that any content in this project infringes on your rights, please contact me. I will promptly remove any infringing material upon valid request.</p>
+            <p>Project Details:</p>
+            <ul>
+                <li>Created by: Guy Clements</li>
+                <li>Purpose: Self-education in web development and API integration</li>
+                <li>GitHub Repository: <a href="https://github.com/GuyMitchy/swapi-interactive" target="_blank">View Source Code</a></li>
+            </ul>
+            <p>Thank you for exploring this project. May the Force be with you!</p>
+        </div>
+    </div>
     
     <script src="./assets/js/script.js"></script>
 

@@ -24,16 +24,31 @@ button {
     cursor: crosshair;
 
 }
+
+button:hover {
+    
+    color: #ffe646
+}
+
 p {
     font-size: 1em;
     color: #fff;
     font-family: 'Retro';
     line-height: 1.5;
 }
+
+.gold:hover {
+    color: #ffe646;
+    /* transition: color 0.3s ease; - Feels too modern */
+}
+
+
+
 .nameTitle {
     font-size: 2em;
-    color: #fff;
+    color: #ffe646;
     font-family: 'Retro';
+
 }
 
 .crosshair {
@@ -155,5 +170,75 @@ body, html {
     justify-content: center;
 }
 
+#infoButton {
+    position: absolute;
+    border: none;
+    bottom: 10px;
+    right: 10px;
+    height: 2rem;
+    width: 2rem;
+    z-index: 100;
+    font-size: 1.5rem;
+    
+}
 
 
+/* INFO MODAL */
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.8);
+}
+
+.modal-content {
+    background-color: #000;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+    font-family: 'Retro', sans-serif;
+    color: #fff;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: #fff;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-content h2 {
+    font-size: 1.5em;
+    margin-bottom: 20px;
+}
+
+.modal-content p, .modal-content ul {
+    font-size: 0.8em;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.modal-content a {
+    color: #ffd700;
+    text-decoration: none;
+}
+
+.modal-content a:hover {
+    text-decoration: underline;
+}
