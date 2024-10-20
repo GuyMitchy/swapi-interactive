@@ -125,17 +125,36 @@ function displayItemDetails(item) {
     rightContent.innerHTML += `<h1 class="nameTitle">${item.name || item.title}</h1>`;
 
     for (let key in item) {
-        if (item[key] && typeof item[key] !== 'object' && key !== 'url' && key !== 'created' && key !== 'edited' && key !== 'homeworld' && key !== 'name' && key !== 'title') {
-            rightContent.innerHTML += `<p>${key.replace('_', ' ').capitalize()}: ${item[key]}</p>`;
+        if (item[key] && typeof item[key] !== 'object' && key !== 'opening_crawl' && key !== 'url' && key !== 'created' && key !== 'edited' && key !== 'homeworld' && key !== 'name' && key !== 'title') {
+            rightContent.innerHTML += `<p><u class="gold_trigger">${key.replace('_', ' ').capitalize()}</u>: <span class="gold_sibling">${item[key]}</span></p>`;
         }
+    }
+
+    if (item.opening_crawl) {
+        rightContent.innerHTML += `<p><u class="gold_trigger">Opening Crawl</u>: <span class="gold_sibling">${item.opening_crawl}</span></p>`;
+    }
+// Special handling for species, as humans species are not included in the species endpoint.
+   
+    if (item.species) {
+        let speciesContent = 'Human';
+        if (item.species.length > 0) {
+            speciesContent = item.species.map(url => {
+                const id = getIdFromUrl(url);
+                const speciesData = starWarsData.species[id];
+                return speciesData ? speciesData.name : 'Unknown';
+            }).join(', ');
+        }
+        rightContent.innerHTML += `<p><u class="gold_trigger">Species</u>: <span class="gold_sibling">${speciesContent}</span></p>`;
     }
 
     // unlike the other related data, the homeworld is not an array, so we need to handle it differently.
     if (item.homeworld) {
         const id = getIdFromUrl(item.homeworld);
         const planetName = starWarsData.planets[id]?.name || 'Unknown';
-        rightContent.innerHTML += `<p>Homeworld: ${planetName}</p>`;
+        rightContent.innerHTML += `<p><u class="gold_trigger">Homeworld</u>: <i class="gold_sibling">${planetName}</i></p>`;
     }
+
+    
 
     // Handle related data (films, people, etc.)
     const relatedCategories = ['films', 'people', 'species', 'starships', 'vehicles', 'planets', 'pilots', 'characters', 'residents'];
@@ -163,7 +182,7 @@ function displayItemDetails(item) {
                 default:
                     displayCategory = relatedCategory.capitalize();
             }
-            rightContent.innerHTML += `<p>${displayCategory}: ${relatedItems}</p>`;
+            rightContent.innerHTML += `<p><u class="gold_trigger">${displayCategory}</u>: <span class="gold_sibling">${relatedItems}</span></p>`;
         }
     }
 }
