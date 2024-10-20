@@ -78,7 +78,7 @@ function createCategoryButtons(data) {
 
     for (let category in data) {
         const button = document.createElement('button');
-        button.textContent = category;
+        button.textContent = category.capitalize();
         button.addEventListener('click', () => clickCategoryButtons(category));
         centerContent.appendChild(button);
     }
@@ -109,29 +109,56 @@ function displayItemDetails(item, category) {
     rightContent.innerHTML = '';
 
     
-    const allKeys = ['name', 'title', 'model', 'manufacturer', 'cost_in_credits', 'length', 'crew', 'passengers', 'cargo_capacity', 'consumables', 'vehicle_class', 'starship_class', 'classification', 'designation', 'average_height', 'average_lifespan', 'eye_colors', 'hair_colors', 'skin_colors', 'language', 'climate', 'terrain', 'surface_water', 'population', 'rotation_period', 'orbital_period', 'diameter', 'gravity'];
+    // const allKeys = ['name', 'title', 'model', 'manufacturer', 'cost_in_credits', 'length', 'crew', 'passengers', 'cargo_capacity', 'consumables', 'vehicle_class', 'starship_class', 'classification', 'designation', 'average_height', 'average_lifespan', 'eye_colors', 'hair_colors', 'skin_colors', 'language', 'climate', 'terrain', 'surface_water', 'population', 'rotation_period', 'orbital_period', 'diameter', 'gravity'];
 
     rightContent.innerHTML += `<h1 class="nameTitle">${item.name || item.title}</h1>`;
 
-    for (let key of allKeys) {
-        if (item[key]) {
+    for (let key in item) {
+        if (item[key] && typeof item[key] !== 'object' && key !== 'url' && key !== 'created' && key !== 'edited' && key !== 'homeworld' && key !== 'name' && key !== 'title') {
             rightContent.innerHTML += `<p>${key.replace('_', ' ').capitalize()}: ${item[key]}</p>`;
         }
     }
 
+    // unlike the other related data, the homeworld is not an array, so we need to handle it differently.
+    if (item.homeworld) {
+        const id = getIdFromUrl(item.homeworld);
+        rightContent.innerHTML += `<p>Homeworld: ${starWarsData.planets[id - 1].name}</p>`;
+    }
+
     // Handle related data (films, people, etc.)
-    const relatedCategories = ['films', 'people', 'species', 'starships', 'vehicles', 'planets'];
+    const relatedCategories = ['films', 'people', 'species', 'starships', 'vehicles', 'planets', 'pilots', 'characters', 'residents'];
 
     for (let relatedCategory of relatedCategories) {
         if (item[relatedCategory] && item[relatedCategory].length > 0) {
             const relatedItems = item[relatedCategory].map(url => {
                 const id = getIdFromUrl(url);
-                const relatedData = starWarsData[relatedCategory][id - 1];
+                // Use 'people' category for 'characters', 'pilots', and 'residents'
+                const dataCategory = ['characters', 'pilots', 'residents'].includes(relatedCategory) ? 'people' : relatedCategory;
+                const relatedData = starWarsData[dataCategory][id - 1];
                 return relatedData ? (relatedData.name || relatedData.title) : 'Unknown';
             }).join(', ');
-            rightContent.innerHTML += `<p>${relatedCategory.capitalize()}: ${relatedItems}</p>`;
+            // Display appropriate category name
+            let displayCategory;
+            switch (relatedCategory) {
+                case 'characters':
+                    displayCategory = 'Characters';
+                    break;
+                case 'pilots':
+                    displayCategory = 'Pilots';
+                    break;
+                case 'residents':
+                    displayCategory = 'Residents';
+                    break;
+                default:
+                    displayCategory = relatedCategory.capitalize();
+            }
+            rightContent.innerHTML += `<p>${displayCategory}: ${relatedItems}</p>`;
         }
     }
+
+    
+
+    
 }
 
 // Helper functions
@@ -153,24 +180,6 @@ function loadingPage() {
 function mainPage() {
     createCategoryButtons(starWarsData);
 }
-
-function peoplePage(data) {
-    displayNameList(data);
-}
-
-
-function planetsPage() {
-}
-
-function filmsPage() {
-}
-
-function speciesPage() {
-}
-
-function vehiclesPage() {
-}
-
 
 
 
