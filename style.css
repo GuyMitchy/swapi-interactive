@@ -13,13 +13,21 @@
     height: 100%;
 }
 
+.loadingTitle {
+    font-size: 1rem;
+    color: #fff;
+    font-family: 'Retro';
+    text-align: center;
+    line-height: 1.5;
+}
+
 button {
     background-color: #000;
     font-family: 'Retro';
     color: #fff;
     padding: 10px 20px;
     margin: 10px;
-    cursor: pointer;
+    cursor: crosshair;
 
 }
 p {
@@ -73,24 +81,30 @@ body, html {
     padding-top: 20px;
 }
 
+
+
 #centerContent {
     position: absolute;
-    top: 50%;
+    top: 82%;
     left: 50%;
     transform: translate(-50%, -50%);
     color: #fff;
     z-index: 100;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: center;
+    width: 100%;
 }
 
 .left-content-container {
+   
+    
     padding-left: 40px;
     padding-top: 20px;
     margin-right: 20px;
-    width: 60%;
+    width: 33.3%;
     height: 90vh; /* Set a fixed height */
   overflow-y: scroll; /* Enable vertical scrolling */
   padding-right: 17px; /* Prevent content shift */

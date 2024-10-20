@@ -26,6 +26,7 @@ function fetchData() {
        if (cachedData) {
            console.log('Using cached data');
            starWarsData = JSON.parse(cachedData);
+           console.log('starWarsData:', starWarsData);
            return Promise.resolve();
        }
    
@@ -35,29 +36,31 @@ function fetchData() {
        // its the else sttatement within the promise chain.
        // we hit it when we get a response with no next page data, and store the data we have then reccurse back up the call stack.
 
+      function fetchAllPages(url, category, results = {}) {   
+        return fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                data.results.forEach(item => {
+                    const id = getIdFromUrl(item.url);
+                    results[id] = item;
+                });
+                if (data.next) {
+                    return fetchAllPages(data.next, category, results);
+                } else {
+                    starWarsData[category] = results;
+                    return results;
+                }
+            });
+    }
 
-       function fetchAllPages(url, category, results = []) {   
-           return fetch(url)
-               .then(response => response.json())
-               .then(data => {
-                   results = results.concat(data.results);
-                   if (data.next) {
-                       return fetchAllPages(data.next, category, results);
-                   } else {
-                       starWarsData[category] = results;
-                       return results;
-                   }
-               });
-       }
-
-
-       for (let category of categories) {
+    for (let category of categories) {
         let promise = fetchAllPages(`${baseUrl}${category}/`, category)
             .catch((e) => {
                 console.error(`Error fetching ${category}: ${e}`);
             });
         promises.push(promise);
     }
+
     return Promise.all(promises).then(() => { 
         console.log('All fetch operations completed.');
         // Cache the data in localStorage
@@ -93,14 +96,22 @@ function displayCategoryData(category) {
     centerContent.innerHTML = '';
     const leftContent = document.getElementById('leftContent');
     leftContent.innerHTML = '';
+    const bg = document.getElementById('section');
+    bg.classList.remove('bg-logo');
+    bg.classList.add('bg-no-logo');
+    const backButton = document.createElement('button');
+    backButton.textContent = 'Back';
+    backButton.addEventListener('click', () => backButtonClick());
+    backButtonContainer.appendChild(backButton);
 
-    for (let item of starWarsData[category]) {
+    for (let item of Object.values(starWarsData[category])) {
         const element = document.createElement('p');
         element.classList.add('crosshair');
         element.textContent = item.name || item.title; // Use title for films, name for others
         leftContent.appendChild(element);
 
         element.addEventListener('click', () => displayItemDetails(item, category));
+        
     }
 }
 
@@ -110,7 +121,7 @@ function displayItemDetails(item, category) {
 
     
     // const allKeys = ['name', 'title', 'model', 'manufacturer', 'cost_in_credits', 'length', 'crew', 'passengers', 'cargo_capacity', 'consumables', 'vehicle_class', 'starship_class', 'classification', 'designation', 'average_height', 'average_lifespan', 'eye_colors', 'hair_colors', 'skin_colors', 'language', 'climate', 'terrain', 'surface_water', 'population', 'rotation_period', 'orbital_period', 'diameter', 'gravity'];
-
+    //Now looping instead of hardcoding the keys.
     rightContent.innerHTML += `<h1 class="nameTitle">${item.name || item.title}</h1>`;
 
     for (let key in item) {
@@ -122,7 +133,8 @@ function displayItemDetails(item, category) {
     // unlike the other related data, the homeworld is not an array, so we need to handle it differently.
     if (item.homeworld) {
         const id = getIdFromUrl(item.homeworld);
-        rightContent.innerHTML += `<p>Homeworld: ${starWarsData.planets[id - 1].name}</p>`;
+        const planetName = starWarsData.planets[id]?.name || 'Unknown';
+        rightContent.innerHTML += `<p>Homeworld: ${planetName}</p>`;
     }
 
     // Handle related data (films, people, etc.)
@@ -132,9 +144,8 @@ function displayItemDetails(item, category) {
         if (item[relatedCategory] && item[relatedCategory].length > 0) {
             const relatedItems = item[relatedCategory].map(url => {
                 const id = getIdFromUrl(url);
-                // Use 'people' category for 'characters', 'pilots', and 'residents'
                 const dataCategory = ['characters', 'pilots', 'residents'].includes(relatedCategory) ? 'people' : relatedCategory;
-                const relatedData = starWarsData[dataCategory][id - 1];
+                const relatedData = starWarsData[dataCategory][id];
                 return relatedData ? (relatedData.name || relatedData.title) : 'Unknown';
             }).join(', ');
             // Display appropriate category name
@@ -165,6 +176,16 @@ function displayItemDetails(item, category) {
 function getIdFromUrl(url) {
     const parts = url.split('/');
     return parts[parts.length - 2];
+}   
+
+function backButtonClick() {
+    const bg = document.getElementById('section')
+    bg.classList.remove('bg-no-logo');
+    bg.classList.add('bg-logo');
+    leftContent.innerHTML = '';
+    rightContent.innerHTML = '';
+    backButtonContainer.innerHTML = '';
+    init();
 }
 
 String.prototype.capitalize = function() {
@@ -174,7 +195,7 @@ String.prototype.capitalize = function() {
 // Page functions.
 
 function loadingPage() {
-    document.getElementById('centerContent').innerHTML = `<h1>Welcome to the swapi.dev interactive database <br>Loading....</h1>`;
+    document.getElementById('centerContent').innerHTML = `<h1 class="loadingTitle">Welcome to the swapi.dev interactive database <br>Loading....</h1>`;
 }
 
 function mainPage() {
@@ -202,8 +223,8 @@ document.addEventListener('DOMContentLoaded', init); //add an event listener to 
 
 
 
-// This is how i disaplyed the people nam elist and data orignally. ive now changed to a more 
-// refinede approach by using this as a template to make agenreal funtion to display all data types.
+// This is how I displayed the people name list and data originally. I've now changed to a more 
+// refined approach by using this as a template to make a general function to display all data types.
 
 
 // function displayNameList(data) {
