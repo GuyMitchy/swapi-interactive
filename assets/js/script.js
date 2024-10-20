@@ -1,4 +1,4 @@
-/* jshint esversion: 6 */
+/* jshint esversion: 11 */
 
 // TEACHING MYSELF API CALLING BY BUILDING THIS INTERACTIVE STAR WARS DATABASE USING LIVE DATA FROM SWAPI - I WILL BE USING THIS CODE AS A TEMPLATE FOR OTHER APIS - HENCE THE COMMENTS
 // AI ASSISTED BUT NO CODE WRITTEN BY AI, JUST USED AS A GUIDE TO HELP ME UNDERSTAND THE API CALLING PROCESS.
@@ -126,12 +126,12 @@ function displayItemDetails(item) {
 
     for (let key in item) {
         if (item[key] && typeof item[key] !== 'object' && key !== 'opening_crawl' && key !== 'url' && key !== 'created' && key !== 'edited' && key !== 'homeworld' && key !== 'name' && key !== 'title') {
-            rightContent.innerHTML += `<p><u class="gold_trigger">${key.replace('_', ' ').capitalize()}</u>: <span class="gold_sibling">${item[key]}</span></p>`;
+            rightContent.innerHTML += `<p><u class="gold_trigger">${key.replace('_', ' ').capitalize()}</u>: <span class="gold_sibling"><i>${item[key]}</i></span></p>`;
         }
     }
 
     if (item.opening_crawl) {
-        rightContent.innerHTML += `<p><u class="gold_trigger">Opening Crawl</u>: <span class="gold_sibling">${item.opening_crawl}</span></p>`;
+        rightContent.innerHTML += `<p><u class="gold_trigger">Opening Crawl</u>: <span class="gold_sibling"><i>${item.opening_crawl}</i></span></p>`;
     }
 // Special handling for species, as humans species are not included in the species endpoint.
    
@@ -144,7 +144,7 @@ function displayItemDetails(item) {
                 return speciesData ? speciesData.name : 'Unknown';
             }).join(', ');
         }
-        rightContent.innerHTML += `<p><u class="gold_trigger">Species</u>: <span class="gold_sibling">${speciesContent}</span></p>`;
+        rightContent.innerHTML += `<p><u class="gold_trigger">Species</u>: <span class="gold_sibling"><i>${speciesContent}</i></span></p>`;
     }
 
     // unlike the other related data, the homeworld is not an array, so we need to handle it differently.
@@ -182,7 +182,7 @@ function displayItemDetails(item) {
                 default:
                     displayCategory = relatedCategory.capitalize();
             }
-            rightContent.innerHTML += `<p><u class="gold_trigger">${displayCategory}</u>: <span class="gold_sibling">${relatedItems}</span></p>`;
+            rightContent.innerHTML += `<p><u class="gold_trigger">${displayCategory}</u>: <span class="gold_sibling"><i>${relatedItems}</i></span></p>`;
         }
     }
 }
@@ -194,7 +194,7 @@ function getIdFromUrl(url) {
 }   
 
 function backButtonClick() {
-    const bg = document.getElementById('section')
+    const bg = document.getElementById('section');
     bg.classList.remove('bg-no-logo');
     bg.classList.add('bg-logo');
     leftContent.innerHTML = '';
@@ -222,19 +222,19 @@ var span = document.getElementsByClassName("close")[0];
 // When the user clicks on the button, open the modal
 btn.onclick = function() {
   modal.style.display = "block";
-}
+};
 
 // When the user clicks on <span> (x), close the modal
 span.onclick = function() {
   modal.style.display = "none";
-}
+};
 
 // When the user clicks anywhere outside of the modal, close it
 window.onclick = function(event) {
   if (event.target == modal) {
     modal.style.display = "none";
   }
-}
+};
 
 // Page functions.
 
