@@ -236,7 +236,7 @@ window.onclick = function(event) {
   }
 };
 
-// AUDIO MODAL
+// AUDIO MODAL - THIS IS ALL AI PRODUCED CODE - I AM GOING TO TRY AND UNDERSTAND HOW IT WORKS AND THEN IMPROVE IT.
 
 // Audio Player functionality
 let audioModal = document.getElementById("audioModal");
