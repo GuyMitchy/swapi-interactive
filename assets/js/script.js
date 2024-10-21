@@ -246,6 +246,11 @@ let audioElement = document.getElementById("audioElement");
 let playlist = document.getElementById("playlist");
 let songs = [];
 
+const playPauseBtn = document.getElementById('playPauseBtn');
+const seekBar = document.getElementById('seekBar');
+const currentTimeSpan = document.getElementById('currentTime');
+const durationSpan = document.getElementById('duration');
+
 audioBtn.onclick = function() {
     audioModal.style.display = "block";
 }
@@ -253,7 +258,6 @@ audioBtn.onclick = function() {
 // Modify the close button functionality
 audioSpan.onclick = function() {
     audioModal.style.display = "none";
-    // Remove this line: audioElement.pause();
 }
 
 // Add a new function to handle closing the modal
@@ -311,15 +315,69 @@ function playSong(index) {
     });
 
     console.log(`Attempting to play: ${song.file}`); // Add this for debugging
+    playPauseBtn.textContent = 'Pause';
 }
 
-// Play next song when current song ends
+function updateModalContent(songTitle) {
+    const modalTitle = document.querySelector('#audioModal .audio-modal-content h2');
+    if (modalTitle) {
+        modalTitle.textContent = songTitle;
+    }
+}
+
+function updateAudioButtonState(isPlaying) {
+    const audioBtn = document.getElementById("audioButton");
+    if (isPlaying) {
+        audioBtn.classList.add("playing");
+    } else {
+        audioBtn.classList.remove("playing");
+    }
+}
+
+function togglePlayPause() {
+    if (audioElement.paused) {
+        audioElement.play();
+        playPauseBtn.textContent = 'Pause';
+    } else {
+        audioElement.pause();
+        playPauseBtn.textContent = 'Play';
+    }
+}
+
+function seek() {
+    audioElement.currentTime = seekBar.value;
+}
+
+function updateTime() {
+    seekBar.value = audioElement.currentTime;
+    currentTimeSpan.textContent = formatTime(audioElement.currentTime);
+}
+
+function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+}
+
+// Event Listeners
+playPauseBtn.addEventListener('click', togglePlayPause);
+seekBar.addEventListener('change', seek);
+audioElement.addEventListener('timeupdate', updateTime);
+audioElement.addEventListener('loadedmetadata', () => {
+    seekBar.max = audioElement.duration;
+    durationSpan.textContent = formatTime(audioElement.duration);
+});
+audioElement.addEventListener('play', () => updateAudioButtonState(true));
+audioElement.addEventListener('pause', () => updateAudioButtonState(false));
 audioElement.addEventListener('ended', () => {
+    updateAudioButtonState(false);
     let currentIndex = songs.findIndex(song => song.file === audioElement.src.split('/').pop());
     let nextIndex = (currentIndex + 1) % songs.length;
     playSong(nextIndex);
 });
-
+audioElement.addEventListener('error', (e) => {
+    console.error('Error with audio playback:', e);
+});
 
 
 // PAGE FUNCTIONS
@@ -435,96 +493,3 @@ document.addEventListener('DOMContentLoaded', init); //add an event listener to 
 
 // }
 
-
-function updateModalContent(songTitle) {
-    const modalTitle = document.querySelector('#audioModal .audio-modal-content h2');
-    if (modalTitle) {
-        modalTitle.textContent = songTitle;
-    }
-}
-
-function updateAudioButtonState(isPlaying) {
-    const audioBtn = document.getElementById("audioButton");
-    if (isPlaying) {
-        audioBtn.classList.add("playing");
-    } else {
-        audioBtn.classList.remove("playing");
-    }
-}
-
-// Add these event listeners to the audioElement
-audioElement.addEventListener('play', () => updateAudioButtonState(true));
-audioElement.addEventListener('pause', () => updateAudioButtonState(false));
-audioElement.addEventListener('ended', () => updateAudioButtonState(false));
-
-audioElement.addEventListener('error', (e) => {
-    console.error('Error with audio playback:', e);
-});
-
-const audioElement2 = document.getElementById('audioElement');
-const playPauseBtn = document.getElementById('playPauseBtn');
-const seekBar = document.getElementById('seekBar');
-const currentTimeSpan = document.getElementById('currentTime');
-const durationSpan = document.getElementById('duration');
-
-playPauseBtn.addEventListener('click', togglePlayPause);
-seekBar.addEventListener('change', seek);
-audioElement2.addEventListener('timeupdate', updateTime);
-audioElement2.addEventListener('loadedmetadata', () => {
-    seekBar.max = audioElement2.duration;
-    durationSpan.textContent = formatTime(audioElement2.duration);
-});
-
-function togglePlayPause() {
-    if (audioElement2.paused) {
-        audioElement2.play();
-        playPauseBtn.textContent = 'Pause';
-    } else {
-        audioElement2.pause();
-        playPauseBtn.textContent = 'Play';
-    }
-}
-
-function seek() {
-    audioElement2.currentTime = seekBar.value;
-}
-
-function updateTime() {
-    seekBar.value = audioElement2.currentTime;
-    currentTimeSpan.textContent = formatTime(audioElement2.currentTime);
-}
-
-function formatTime(seconds) {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = Math.floor(seconds % 60);
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-}
-
-function playSong(index) {
-    let song = songs[index];
-    audioElement2.innerHTML = ''; // Clear previous sources
-    
-    // Add source for webm or m4a
-    let source = document.createElement('source');
-    source.src = `./assets/star_wars_music/${song.file}`;
-    source.type = song.file.endsWith('.webm') ? 'audio/webm' : 'audio/x-m4a';
-    audioElement2.appendChild(source);
-    
-    audioElement2.load(); // Important: reload the audio element
-    audioElement2.play().catch(e => console.error('Error playing audio:', e));
-    playPauseBtn.textContent = 'Pause';
-    
-    // Update modal content
-    updateModalContent(song.title);
-    
-    // Update active song in playlist
-    Array.from(playlist.children).forEach((li, i) => {
-        if (i === index) {
-            li.classList.add('active');
-        } else {
-            li.classList.remove('active');
-        }
-    });
-
-    console.log(`Attempting to play: ${song.file}`); // Add this for debugging
-}
