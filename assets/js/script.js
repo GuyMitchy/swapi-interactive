@@ -269,7 +269,7 @@ window.onclick = function(event) {
 }
 
 // Load songs from JSON
-fetch('./assets/js/song_list.json')
+fetch('./assets/js/songs.json')
     .then(response => response.json())
     .then(data => {
         songs = data.songs;
