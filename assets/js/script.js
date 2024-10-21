@@ -208,35 +208,121 @@ String.prototype.capitalize = function() {
 };
 
 
-// INFO MODAL
+// INFO MODAL  --wrap this in a function!!!
 
-// Get the modal
-var modal = document.getElementById("infoModal");
 
-// Get the button that opens the modal
-var btn = document.getElementById("infoButton");
+const infoModal = document.getElementById("infoModal");
 
-// Get the <span> element that closes the modal
-var span = document.getElementsByClassName("close")[0];
 
-// When the user clicks on the button, open the modal
-btn.onclick = function() {
-  modal.style.display = "block";
+const infobtn = document.getElementById("infoButton");
+
+
+const close = document.getElementsByClassName("close")[0];
+
+
+infobtn.onclick = function() {
+  infoModal.style.display = "block";
 };
 
-// When the user clicks on <span> (x), close the modal
-span.onclick = function() {
-  modal.style.display = "none";
+
+close.onclick = function() {
+  infoModal.style.display = "none";
 };
 
 // When the user clicks anywhere outside of the modal, close it
 window.onclick = function(event) {
-  if (event.target == modal) {
-    modal.style.display = "none";
+  if (event.target == infoModal) {
+    infoModal.style.display = "none";
   }
 };
 
-// Page functions.
+// AUDIO MODAL
+
+// Audio Player functionality
+let audioModal = document.getElementById("audioModal");
+let audioBtn = document.getElementById("audioButton");
+let audioSpan = audioModal.getElementsByClassName("close")[0];
+let audioElement = document.getElementById("audioElement");
+let playlist = document.getElementById("playlist");
+let songs = [];
+
+audioBtn.onclick = function() {
+    audioModal.style.display = "block";
+}
+
+// Modify the close button functionality
+audioSpan.onclick = function() {
+    audioModal.style.display = "none";
+    // Remove this line: audioElement.pause();
+}
+
+// Add a new function to handle closing the modal
+function closeAudioModal() {
+    audioModal.style.display = "none";
+}
+
+// Modify the window click event to use the new function
+window.onclick = function(event) {
+    if (event.target == audioModal) {
+        closeAudioModal();
+    }
+}
+
+// Load songs from JSON
+fetch('./assets/js/song_list.json')
+    .then(response => response.json())
+    .then(data => {
+        songs = data.songs;
+        loadPlaylist();
+    });
+
+function loadPlaylist() {
+    songs.forEach((song, index) => {
+        let li = document.createElement("li");
+        li.textContent = song.title;
+        li.onclick = () => playSong(index);
+        playlist.appendChild(li);
+    });
+}
+
+function playSong(index) {
+    let song = songs[index];
+    audioElement.innerHTML = ''; // Clear previous sources
+    
+    // Add source for webm or m4a
+    let source = document.createElement('source');
+    source.src = `./assets/star_wars_music/${song.file}`;
+    source.type = song.file.endsWith('.webm') ? 'audio/webm' : 'audio/x-m4a';
+    audioElement.appendChild(source);
+    
+    audioElement.load(); // Important: reload the audio element
+    audioElement.play().catch(e => console.error('Error playing audio:', e));
+    
+    // Update modal content
+    updateModalContent(song.title);
+    
+    // Update active song in playlist
+    Array.from(playlist.children).forEach((li, i) => {
+        if (i === index) {
+            li.classList.add('active');
+        } else {
+            li.classList.remove('active');
+        }
+    });
+
+    console.log(`Attempting to play: ${song.file}`); // Add this for debugging
+}
+
+// Play next song when current song ends
+audioElement.addEventListener('ended', () => {
+    let currentIndex = songs.findIndex(song => song.file === audioElement.src.split('/').pop());
+    let nextIndex = (currentIndex + 1) % songs.length;
+    playSong(nextIndex);
+});
+
+
+
+// PAGE FUNCTIONS
 
 function loadingPage() {
     document.getElementById('centerContent').innerHTML = `<h1 class="loadingTitle">Welcome to the swapi.dev interactive database <br>Loading....</h1>`;
@@ -348,3 +434,97 @@ document.addEventListener('DOMContentLoaded', init); //add an event listener to 
 
 
 // }
+
+
+function updateModalContent(songTitle) {
+    const modalTitle = document.querySelector('#audioModal .audio-modal-content h2');
+    if (modalTitle) {
+        modalTitle.textContent = songTitle;
+    }
+}
+
+function updateAudioButtonState(isPlaying) {
+    const audioBtn = document.getElementById("audioButton");
+    if (isPlaying) {
+        audioBtn.classList.add("playing");
+    } else {
+        audioBtn.classList.remove("playing");
+    }
+}
+
+// Add these event listeners to the audioElement
+audioElement.addEventListener('play', () => updateAudioButtonState(true));
+audioElement.addEventListener('pause', () => updateAudioButtonState(false));
+audioElement.addEventListener('ended', () => updateAudioButtonState(false));
+
+audioElement.addEventListener('error', (e) => {
+    console.error('Error with audio playback:', e);
+});
+
+const audioElement2 = document.getElementById('audioElement');
+const playPauseBtn = document.getElementById('playPauseBtn');
+const seekBar = document.getElementById('seekBar');
+const currentTimeSpan = document.getElementById('currentTime');
+const durationSpan = document.getElementById('duration');
+
+playPauseBtn.addEventListener('click', togglePlayPause);
+seekBar.addEventListener('change', seek);
+audioElement2.addEventListener('timeupdate', updateTime);
+audioElement2.addEventListener('loadedmetadata', () => {
+    seekBar.max = audioElement2.duration;
+    durationSpan.textContent = formatTime(audioElement2.duration);
+});
+
+function togglePlayPause() {
+    if (audioElement2.paused) {
+        audioElement2.play();
+        playPauseBtn.textContent = 'Pause';
+    } else {
+        audioElement2.pause();
+        playPauseBtn.textContent = 'Play';
+    }
+}
+
+function seek() {
+    audioElement2.currentTime = seekBar.value;
+}
+
+function updateTime() {
+    seekBar.value = audioElement2.currentTime;
+    currentTimeSpan.textContent = formatTime(audioElement2.currentTime);
+}
+
+function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+}
+
+function playSong(index) {
+    let song = songs[index];
+    audioElement2.innerHTML = ''; // Clear previous sources
+    
+    // Add source for webm or m4a
+    let source = document.createElement('source');
+    source.src = `./assets/star_wars_music/${song.file}`;
+    source.type = song.file.endsWith('.webm') ? 'audio/webm' : 'audio/x-m4a';
+    audioElement2.appendChild(source);
+    
+    audioElement2.load(); // Important: reload the audio element
+    audioElement2.play().catch(e => console.error('Error playing audio:', e));
+    playPauseBtn.textContent = 'Pause';
+    
+    // Update modal content
+    updateModalContent(song.title);
+    
+    // Update active song in playlist
+    Array.from(playlist.children).forEach((li, i) => {
+        if (i === index) {
+            li.classList.add('active');
+        } else {
+            li.classList.remove('active');
+        }
+    });
+
+    console.log(`Attempting to play: ${song.file}`); // Add this for debugging
+}

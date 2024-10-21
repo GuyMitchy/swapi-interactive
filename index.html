@@ -13,6 +13,7 @@
 <body>
     <section id="section" class="bg-logo">
         <button id="infoButton"><i class="fa fa-info-circle"></i></button>
+        <button id="audioButton"><i class="fa fa-music"></i></button>
         
        
         
@@ -47,6 +48,25 @@
                 <li>GitHub Repository: <a href="https://github.com/GuyMitchy/swapi-interactive" target="_blank">View Source Code</a></li>
             </ul>
             <p>Thank you for exploring this project. <br><span class="gold_static">May the Force be with you!</span></p>
+        </div>
+    </div>
+
+    <!-- AUDIO MODAL -->
+    <div id="audioModal" class="modal">
+        <div class="modal-content audio-modal-content">
+            <span class="close">&times;</span>
+            <h2 class="gold_static">Star Wars Soundtrack</h2>
+            <div id="audioPlayer">
+                <audio id="audioElement" preload="auto"></audio>
+                <div id="customAudioControls">
+                    <button id="playPauseBtn">Play/Pause</button>
+                    <input type="range" id="seekBar" value="0">
+                    <span id="currentTime">0:00</span> / <span id="duration">0:00</span>
+                </div>
+                <div id="playlistContainer">
+                    <ul id="playlist"></ul>
+                </div>
+            </div>
         </div>
     </div>
     

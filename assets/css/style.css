@@ -252,3 +252,136 @@ body, html {
 .modal-content a:hover {
     text-decoration: underline;
 }
+
+/* AUDIO MODAL */
+
+/* Audio Modal Styles */
+.audio-modal-content {
+    background-color: #000;
+    color: #fff;
+    font-family: 'Retro', sans-serif;
+    height: 100%;
+}
+
+#audioPlayer {
+    margin-top: 20px;
+    
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    #playlistContainer::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Hide scrollbar for IE, Edge and Firefox */
+    #playlistContainer {
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+    }
+}
+
+#audioElement {
+    display: none; /* Hide the default audio element */
+}
+
+#customAudioControls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #000;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+#playPauseBtn {
+    background-color: #ffd700;
+    color: #000;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-family: 'Retro', sans-serif;
+}
+
+#seekBar {
+    width: 60%;
+    -webkit-appearance: none;
+    background: #333;
+    outline: none;
+    opacity: 0.7;
+    transition: opacity .2s;
+}
+
+#seekBar:hover {
+    opacity: 1;
+}
+
+#seekBar::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    background: #ffd700;
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+#seekBar::-moz-range-thumb {
+    width: 15px;
+    height: 15px;
+    background: #ffd700;
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+#currentTime, #duration {
+    font-family: 'Retro', sans-serif;
+    color: #ffd700;
+}
+
+#playlistContainer {
+    margin-top: 20px;
+    max-height: 500px;
+    overflow-y: auto;
+    height: 100%;
+}
+
+#playlist {
+    list-style-type: none;
+    padding: 0;
+    
+}
+
+#playlist li {
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#playlist li:hover {
+    background-color: #333;
+    color: #ffd700;
+}
+
+#playlist li.active {
+    background-color: #ffd700;
+    color: #000;
+}
+
+#audioButton {
+    position: absolute;
+    border: none;
+    bottom: 10px;
+    right: 50px;
+    height: 2rem;
+    width: 2rem;
+    z-index: 100;
+    font-size: 1.5rem;
+}
+
+#audioButton.playing {
+    
+    color: #fff200;
+}
+
+.audio-modal-content {
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
